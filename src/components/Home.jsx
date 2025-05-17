@@ -1,8 +1,5 @@
 import { motion } from "framer-motion";
-// import background from "../assets/expense-bg2.jpg";
 import background from "../assets/cm-background.jpg";
-
-// import wallet from '../assets/wallet.png';
 import cubic from "../assets/cube.png";
 import TopNavbar from "../components/TopNavbar";
 import Navbar from "../components/Navbar";
