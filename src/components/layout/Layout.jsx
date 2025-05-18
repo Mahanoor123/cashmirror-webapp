@@ -1,16 +1,17 @@
-import React from 'react'
-import TopNavbar from '../TopNavbar'
-import Navbar from '../Navbar'
-import Footer from '../Footer'
-import { Outlet } from 'react-router-dom'
+import React from "react";
+import TopNavbar from "../TopNavbar";
+import Navbar from "../Navbar";
+import Footer from "../Footer";
+import { Outlet } from "react-router-dom";
+import ParallexWrapper from "../ParallexWrapper";
 
 const Layout = () => {
   return (
     <>
-    <Outlet />
-    <Footer />
+      <Outlet />
+      <Footer />
     </>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

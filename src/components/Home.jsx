@@ -7,9 +7,11 @@ import {
   ArrowUpRight,
   ChartBar,
 } from "lucide-react";
+import ParallexWrapper from "./ParallexWrapper";
 
 const Home = () => {
   return (
+    <ParallexWrapper>
     <div
       className="bg-cover bg-center bg-no-repeat h-screen w-full"
       style={{ backgroundImage: `url(${background})` }}
@@ -49,6 +51,7 @@ const Home = () => {
         </div>
       </div>
     </div>
+    </ParallexWrapper>
   );
 };
 
