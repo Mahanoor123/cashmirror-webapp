@@ -9,7 +9,9 @@ import Expense from "./components/Expense";
 import Savings from "./components/Savings";
 import Reports from "./components/Reports";
 import SignupForm from "./pages/SignupForm";
-import { ParallaxProvider } from "react-scroll-parallax";
+import ProtectedRoutes from "./components/ProtectedRoutes";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const router = createBrowserRouter([
@@ -18,7 +20,14 @@ function App() {
       element: <Layout />,
       children: [
         { index: true, element: <Home /> },
-        { path: "dashboard", element: <Dashboard /> },
+        {
+          path: "dashboard",
+          element: (
+            <ProtectedRoutes>
+              <Dashboard />
+            </ProtectedRoutes>
+          ),
+        },
         { path: "budget", element: <Budget /> },
         { path: "expense", element: <Expense /> },
         { path: "savings", element: <Savings /> },
@@ -31,9 +40,8 @@ function App() {
 
   return (
     <>
-      <ParallaxProvider>
-        <RouterProvider router={router} />
-      </ParallaxProvider>
+      <RouterProvider router={router} />
+      <ToastContainer position="top-center" autoClose={3000} theme="dark" />
     </>
   );
 }

@@ -1,19 +1,19 @@
 import ParallexWrapper from "./ParallexWrapper";
-import background from "../assets/expense-bg2.jpg";
+import background from "../assets/cm-background.jpg";
 import TopNavbar from "../components/TopNavbar";
 import Navbar from "../components/Navbar";
 
 const Expense = () => {
   return (
-    <>
-      <ParallexWrapper>
-        <div
-          className="bg-cover bg-center bg-no-repeat h-auto w-screen fixed top-0 left-0"
-          style={{ backgroundImage: `url(${background})` }}
-        >
-          <TopNavbar />
-          <Navbar />
-          <form className="backdrop-blur-md bg-white/10 border border-white/30 rounded-2xl p-8 w-[35vw] mx-auto mt-10 shadow-xl text-white">
+    <ParallexWrapper>
+      <div
+        className="bg-cover bg-center bg-no-repeat w-full min-h-screen"
+        style={{ backgroundImage: `url(${background})` }}
+      >
+        <TopNavbar />
+        <Navbar />
+        <section className="py-16">
+          <form className="backdrop-blur-md bg-white/10 border border-white/30 rounded-2xl p-8 w-[35vw] mx-auto shadow-xl text-white">
             <h2 className="text-2xl font-bold mb-6 text-center">
               Add New Expense
             </h2>
@@ -70,9 +70,9 @@ const Expense = () => {
               </button>
             </div>
           </form>
-        </div>
-      </ParallexWrapper>
-    </>
+        </section>
+      </div>
+    </ParallexWrapper>
   );
 };
 
