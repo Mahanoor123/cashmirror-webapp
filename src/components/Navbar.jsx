@@ -2,9 +2,7 @@ import { NavLink } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import {
   CoinsIcon,
-  File,
   LayoutDashboard,
-  SaveIcon,
   Wallet,
 } from "lucide-react";
 
@@ -28,14 +26,6 @@ const Navbar = () => {
         <NavLink to="/expense" className={linkStyles}>
           <CoinsIcon className="w-5" />
           My Expense
-        </NavLink>
-        <NavLink to="/savings" className={linkStyles}>
-          <SaveIcon className="w-5" />
-          My Savings
-        </NavLink>
-        <NavLink to="/reports" className={linkStyles}>
-          <File className="w-5" />
-          Reports
         </NavLink>
       </nav>
     </AnimatePresence>

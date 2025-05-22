@@ -2,8 +2,74 @@ import ParallexWrapper from "./ParallexWrapper";
 import background from "../assets/cm-background.jpg";
 import TopNavbar from "../components/TopNavbar";
 import Navbar from "../components/Navbar";
+import { useState } from "react";
+import {
+  doc,
+  db,
+  getDoc,
+  updateDoc,
+  addDoc,
+  collection,
+  Timestamp,
+} from "../config/firebase-config.js";
+import { useAuth } from "../contexts/AuthContext";
+import { toast, ToastContainer } from "react-toastify";
 
 const Expense = () => {
+  const { user } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const title = form.title.value;
+    const amount = parseFloat(form.amount.value);
+    const category = form.category.value;
+    const date = form.date.value;
+    const note = form.note.value;
+
+    if (!title || !amount || !category || !date) {
+      toast.error("Please fill all required fields!");
+      return;
+    }
+
+    try {
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        toast.error("User not found");
+        return;
+      }
+
+      const currentBalance = userSnap?.data().balance || 0;
+
+      if (currentBalance < amount) {
+        toast.warning("Insufficient balance!");
+        return;
+      }
+
+      await addDoc(collection(db, "expenses"), {
+        title,
+        amount,
+        category,
+        date,
+        note,
+        createdAt: new Date(),
+      });
+
+      await updateDoc(userRef, {
+        balance: currentBalance - amount,
+      });
+
+      toast.success("Expense added successfully!");
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add expense");
+    }
+  };
+
   return (
     <ParallexWrapper>
       <div
@@ -13,7 +79,10 @@ const Expense = () => {
         <TopNavbar />
         <Navbar />
         <section className="py-16">
-          <form className="backdrop-blur-md bg-white/10 border border-white/30 rounded-2xl p-8 w-[35vw] mx-auto shadow-xl text-white">
+          <form
+            onSubmit={handleSubmit}
+            className="backdrop-blur-md bg-white/10 border border-white/30 rounded-2xl p-8 w-[35vw] mx-auto shadow-xl text-white"
+          >
             <h2 className="text-2xl font-bold mb-6 text-center">
               Add New Expense
             </h2>

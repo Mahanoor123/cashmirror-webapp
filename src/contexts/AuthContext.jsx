@@ -4,7 +4,7 @@ import {
   getDoc,
   db,
   doc,
-  signOut
+  signOut,
 } from "../config/firebase-config.js";
 import { createContext, useEffect, useState, useContext } from "react";
 
@@ -36,18 +36,17 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-        await signOut(auth);
+      await signOut(auth);
     } catch (error) {
-        console.error("Logout Error", error.message)
+      console.error("Logout Error", error.message);
     }
-  }
+  };
 
   return (
-    <AuthContext.Provider value={{user, userData, loading, logout}} >
-        {children}
+    <AuthContext.Provider value={{ user, userData, loading, logout }}>
+      {children}
     </AuthContext.Provider>
-  )
+  );
 };
-
 
 export const useAuth = () => useContext(AuthContext);

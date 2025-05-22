@@ -6,8 +6,6 @@ import Layout from "./components/layout/Layout";
 import Home from "./components/Home";
 import Budget from "./components/Budget";
 import Expense from "./components/Expense";
-import Savings from "./components/Savings";
-import Reports from "./components/Reports";
 import SignupForm from "./pages/SignupForm";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import { ToastContainer } from "react-toastify";
@@ -30,8 +28,6 @@ function App() {
         },
         { path: "budget", element: <Budget /> },
         { path: "expense", element: <Expense /> },
-        { path: "savings", element: <Savings /> },
-        { path: "report", element: <Reports /> },
         { path: "login", element: <LoginForm /> },
         { path: "signup", element: <SignupForm /> },
       ],

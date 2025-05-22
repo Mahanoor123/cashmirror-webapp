@@ -44,7 +44,8 @@ const LoginForm = () => {
         loginData.email,
         loginData.password
       );
-
+      const user = auth.currentUser;   
+      localStorage.setItem("currentUserId", user.uid)
       toast.success("You've logged in successfully");
       navigate('/dashboard');
     } catch (error) {

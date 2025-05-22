@@ -39,11 +39,14 @@ const Budget = () => {
     }
 
     try {
+      const addedBalance = parseFloat(inputBalance);
+      const newBalance = balance + addedBalance;
+
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
-        balance: parseFloat(inputBalance),
+        balance: newBalance,
       });
-      setBalance(parseFloat(inputBalance));
+      setBalance(newBalance);
       setInputBalance("");
       setEditMode(false);
       toast.success("Balance updated successfully!");

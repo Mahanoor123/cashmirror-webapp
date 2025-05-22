@@ -7,9 +7,21 @@ import {
   signInWithPopup,
   sendPasswordResetEmail,
   onAuthStateChanged,
-  signOut
+  signOut,
 } from "firebase/auth";
-import { doc, setDoc, getFirestore, getDoc , updateDoc} from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getFirestore,
+  getDoc,
+  updateDoc,
+  addDoc,
+  collection,
+  Timestamp,
+  getDocs,
+  query,
+  where
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCZ1L24jgOssnaO65QUum7qpB-IXnXbYSU",
@@ -38,5 +50,11 @@ export {
   sendPasswordResetEmail,
   onAuthStateChanged,
   signOut,
-  updateDoc
+  updateDoc,
+  addDoc,
+  collection,
+  Timestamp,
+  getDocs,
+  query,
+  where
 };

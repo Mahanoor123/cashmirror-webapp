@@ -12,6 +12,7 @@ const TopNavbar = () => {
     const confirmLogout = confirm("Are you sure to logout?");
     if (confirmLogout) {
       await logout();
+      localStorage.removeItem("currentUserId");
       toast.success("You've been logout successfully!", {autoClose: 1500});
       setTimeout(() => {
       navigate("/login");

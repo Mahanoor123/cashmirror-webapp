@@ -5,17 +5,76 @@ import { ArrowUpRight, ChartBar, CoinsIcon, PencilIcon } from "lucide-react";
 import ParallexWrapper from "../components/ParallexWrapper";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  doc,
+  db,
+  getDoc,
+  updateDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+} from "../config/firebase-config.js";
 
 const Dashboard = () => {
+  const { user } = useAuth();
+  const [balance, setBalance] = useState(0);
+  const [expenses, setExpenses] = useState([]);
+  const [totalExpense, setTotalExpense] = useState(0);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!user) return;
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        setBalance(data?.balance || 0);
+      }
+    };
+
+    fetchBalance();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const expenseRef = collection(db, "expenses");
+        const q = query(expenseRef, where("userId", "==", user.uid));
+
+        const snapshot = await getDocs(q);
+        const expensesData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setExpenses(expensesData);
+
+        const total = expensesData.reduce(
+          (acc, curr) => acc + parseFloat(curr.amount),
+          0
+        );
+        setTotalExpense(total);
+      } catch (err) {
+        console.error("Error fetching expenses:", err);
+      }
+    };
+
+    fetchExpenses();
+  }, [expenses]);
+
   const navigate = useNavigate();
 
-  const navigateDashboard = () => {
+  const navigateBudget = () => {
     navigate("/budget");
   };
 
   const navigateExpense = () => {
     navigate("/expense");
-  }
+  };
 
   return (
     <ParallexWrapper>
@@ -36,9 +95,9 @@ const Dashboard = () => {
                 </h1>
                 <div className="flex gap-2 items-center text-white text-lg py-2">
                   <CoinsIcon className="text-blue-700" />
-                  <p className="text-2xl">0.00</p>
+                  <p className="text-2xl">${balance?.toFixed(2)}</p>
                   <PencilIcon
-                    onClick={navigateDashboard}
+                    onClick={navigateBudget}
                     className="w-5 h-5 ml-4 text-white cursor-pointer hover:text-blue-500 transition"
                   />
                 </div>
@@ -50,7 +109,7 @@ const Dashboard = () => {
                 </h1>
                 <div className="flex gap-2 items-center text-white text-lg py-2">
                   <CoinsIcon className="text-blue-700" />
-                  <p>0.00</p>
+                  <p className="text-2xl">{totalExpense.toFixed(2)}</p>
                   <PencilIcon
                     onClick={navigateExpense}
                     className="w-5 h-5 ml-4 text-white cursor-pointer hover:text-blue-500 transition"
@@ -77,31 +136,43 @@ const Dashboard = () => {
               Expenses History
             </h1>
             <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg">
-              <table className="w-full text-left text-sm text-white">
-                <thead>
-                  <tr className="uppercase text-white/60 text-xs border-b border-white/10">
-                    <th className="py-3 px-4">Category</th>
-                    <th className="py-3 px-4">Description</th>
-                    <th className="py-3 px-4">Amount</th>
-                    <th className="py-3 px-4">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="hover:bg-white/10 transition">
-                    <td className="py-3 px-4">Groceries</td>
-                    <td className="py-3 px-4">Monthly supermarket shopping</td>
-                    <td className="py-3 px-4">$120.00</td>
-                    <td className="py-3 px-4 flex gap-2">
-                      <button className="px-3 py-1 rounded-md bg-purple-500 text-white text-xs hover:bg-purple-600 transition">
-                        Edit
-                      </button>
-                      <button className="px-3 py-1 rounded-md bg-red-500 text-white text-xs hover:bg-red-600 transition">
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              {expenses.length === 0 ? (
+                <p className="text-white/60">No expenses found.</p>
+              ) : (
+                <table className="w-full text-left text-sm text-white">
+                  <thead>
+                    <tr className="uppercase text-white/60 text-xs border-b border-white/10">
+                      <th className="py-3 px-4">Category</th>
+                      <th className="py-3 px-4">Title</th>
+                      <th className="py-3 px-4">Description</th>
+                      <th className="py-3 px-4">Amount</th>
+                      <th className="py-3 px-4">Date</th>
+                      <th className="py-3 px-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {expenses.map((expense) => (
+                      <tr className="hover:bg-white/10 transition">
+                        <td className="py-3 px-4">{expense?.category}</td>
+                        <td className="py-3 px-4">{expense?.title}</td>
+                        <td className="py-3 px-4">{expense?.note}</td>
+                        <td className="py-3 px-4">
+                          {parseFloat(expense.amount).toFixed(2)}
+                        </td>
+                        <td className="py-3 px-4">{expense?.date}</td>
+                        <td className="py-3 px-4 flex gap-2">
+                          <button className="px-3 py-1 rounded-md bg-purple-500 text-white text-xs hover:bg-purple-600 transition">
+                            Edit
+                          </button>
+                          <button className="px-3 py-1 rounded-md bg-red-500 text-white text-xs hover:bg-red-600 transition">
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </section>
