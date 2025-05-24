@@ -121,7 +121,7 @@ const LoginForm = () => {
       >
         <form
           onSubmit={handleRegister}
-          className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-xl p-10 w-[90%] max-w-md flex flex-col items-center gap-6 text-white"
+           className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-xl p-6 sm:p-10 w-[90%] max-w-md mx-auto flex flex-col items-center gap-5 text-white"
         >
           <h1 className="text-4xl font-light tracking-wide mb-2">Signup</h1>
 
@@ -251,7 +251,7 @@ const LoginForm = () => {
 
           {/* Signup Link */}
           <p className="text-sm text-white/70">
-            Don't have an account?{" "}
+            Already have an account?{" "}
             <NavLink to="/login" className="underline hover:text-purple-800">
               Login
             </NavLink>

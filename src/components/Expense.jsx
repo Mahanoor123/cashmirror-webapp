@@ -2,7 +2,7 @@ import ParallexWrapper from "./ParallexWrapper";
 import background from "../assets/cm-background.jpg";
 import TopNavbar from "../components/TopNavbar";
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   doc,
   db,
@@ -14,9 +14,39 @@ import {
 } from "../config/firebase-config.js";
 import { useAuth } from "../contexts/AuthContext";
 import { toast, ToastContainer } from "react-toastify";
+import { useParams, useNavigate } from "react-router-dom";
+import { useExpenses } from "../contexts/EXpensesContext.jsx";
+import { CalendarDays } from "lucide-react";
 
 const Expense = () => {
   const { user } = useAuth();
+  const { setBalance } = useExpenses();
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [editMode, setEditMode] = useState(false);
+  const [expenseData, setExpenseData] = useState({});
+
+  useEffect(() => {
+    if (id) {
+      setEditMode(true);
+      fetchExpense();
+    }
+  }, [id]);
+
+  const fetchExpense = async () => {
+    try {
+      const docRef = doc(db, "expenses", id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setExpenseData(docSnap.data());
+      } else {
+        toast.error("Expense not found");
+      }
+    } catch (error) {
+      toast.error("Failed to fetch expense data");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,29 +74,59 @@ const Expense = () => {
 
       const currentBalance = userSnap?.data().balance || 0;
 
-      if (currentBalance < amount) {
-        toast.warning("Insufficient balance!");
-        return;
+      if (editMode) {
+        const expenseRef = doc(db, "expenses", id);
+        const oldAmount = expenseData.amount || 0;
+        const balanceDelta = oldAmount - amount;
+
+        if (currentBalance + oldAmount < amount) {
+          toast.warning("Insufficient balance after update!");
+          return;
+        }
+
+        await updateDoc(expenseRef, {
+          title,
+          amount,
+          category,
+          date,
+          note,
+        });
+
+        await updateDoc(userRef, {
+          balance: currentBalance + oldAmount - amount,
+        });
+
+        toast.success("Expense updated successfully!");
+      } else {
+        if (currentBalance < amount) {
+          toast.warning("Insufficient balance!");
+          return;
+        }
+
+        await addDoc(collection(db, "expenses"), {
+          title,
+          amount,
+          category,
+          date,
+          note,
+          userId: user.uid,
+          createdAt: new Date(),
+        });
+
+        await updateDoc(userRef, {
+          balance: currentBalance - amount,
+        });
+
+        setBalance(currentBalance - amount);
+
+        toast.success("Expense added successfully!");
+        form.reset();
       }
 
-      await addDoc(collection(db, "expenses"), {
-        title,
-        amount,
-        category,
-        date,
-        note,
-        createdAt: new Date(),
-      });
-
-      await updateDoc(userRef, {
-        balance: currentBalance - amount,
-      });
-
-      toast.success("Expense added successfully!");
-      form.reset();
+      setTimeout(() => navigate("/dashboard"), 1500);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to add expense");
+      toast.error("Failed to submit expense");
     }
   };
 
@@ -81,61 +141,71 @@ const Expense = () => {
         <section className="py-16">
           <form
             onSubmit={handleSubmit}
-            className="backdrop-blur-md bg-white/10 border border-white/30 rounded-2xl p-8 w-[35vw] mx-auto shadow-xl text-white"
+            className="backdrop-blur-md bg-white/10 border border-white/30 rounded-2xl p-8 w-full max-w-lg mx-auto shadow-2xl text-white"
           >
-            <h2 className="text-2xl font-bold mb-6 text-center">
-              Add New Expense
+            <h2 className="text-3xl font-bold mb-6 text-center font-[Oxanium]">
+              {editMode ? "Edit Expense" : "Add New Expense"}
             </h2>
 
             <div className="flex flex-col gap-4">
               <input
                 type="text"
                 name="title"
-                placeholder="Expense Title"
+                defaultValue={expenseData.title || ""}
+                placeholder="📝 Expense Title"
                 required
-                className="bg-white/20 px-4 py-2 rounded-md placeholder-white focus:outline-none"
+                className="bg-white/20 px-4 py-3 rounded-md placeholder-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
 
               <input
                 type="number"
                 name="amount"
-                placeholder="Amount (Rs)"
+                defaultValue={expenseData.amount || ""}
+                placeholder="💰 Amount (Rs)"
                 required
-                className="bg-white/20 px-4 py-2 rounded-md placeholder-white focus:outline-none"
+                className="bg-white/20 px-4 py-3 rounded-md placeholder-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
 
               <select
                 name="category"
+                defaultValue={expenseData.category || ""}
                 required
-                className="bg-white/20 px-4 py-2 rounded-md text-white focus:outline-none"
+                className="bg-white/20 px-4 py-3 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
               >
-                <option value="">Select Category</option>
-                <option value="Food">🍔 Food</option>
-                <option value="Travel">✈️ Travel</option>
-                <option value="Shopping">🛍️ Shopping</option>
-                <option value="Bills">📩 Bills</option>
-                <option value="Others">📦 Others</option>
+                <option value="" disabled >
+                  Select Category
+                </option>
+                <option value="Food" className="text-black bg-slate-500">🍔 Food</option>
+                <option value="Travel" className="text-black bg-slate-500">✈️ Travel</option>
+                <option value="Shopping" className="text-black bg-slate-500">🛍️ Shopping</option>
+                <option value="Bills" className="text-black bg-slate-500">📩 Bills</option>
+                <option value="Others" className="text-black bg-slate-500">📦 Others</option>
               </select>
 
-              <input
-                type="date"
-                name="date"
-                required
-                className="bg-white/20 px-4 py-2 rounded-md focus:outline-none text-white"
-              />
+              <div className="relative">
+                <input
+                  type="date"
+                  name="date"
+                  defaultValue={expenseData.date || ""}
+                  required
+                  className="bg-white/20 px-4 py-3 rounded-md focus:outline-none text-white w-full pr-10 focus:ring-2 focus:ring-purple-500"
+                />
+                
+              </div>
 
               <textarea
                 name="note"
-                placeholder="Optional Note"
+                defaultValue={expenseData.note || ""}
+                placeholder="🗒️ Optional Note"
                 rows={3}
-                className="bg-white/20 px-4 py-2 rounded-md placeholder-white focus:outline-none resize-none"
+                className="bg-white/20 px-4 py-3 rounded-md placeholder-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
               />
 
               <button
                 type="submit"
-                className="bg-purple-600 text-white font-semibold px-6 py-2 mt-4 rounded-md hover:bg-purple-700 transition-all"
+                className="bg-gradient-to-r from-purple-600 to-purple-800 text-white font-semibold px-6 py-3 mt-4 rounded-lg hover:from-purple-700 hover:to-purple-900 transition-all"
               >
-                Submit Expense
+                {editMode ? "Update Expense" : "Submit Expense"}
               </button>
             </div>
           </form>

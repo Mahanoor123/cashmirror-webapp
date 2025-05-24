@@ -20,7 +20,9 @@ import {
   Timestamp,
   getDocs,
   query,
-  where
+  where,
+  deleteDoc,
+  onSnapshot
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -56,5 +58,7 @@ export {
   Timestamp,
   getDocs,
   query,
-  where
+  where,
+  deleteDoc,
+  onSnapshot
 };

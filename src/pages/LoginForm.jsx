@@ -8,7 +8,7 @@ import {
   signInWithEmailAndPassword,
   provider,
   signInWithPopup,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
 } from "../config/firebase-config.js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -44,10 +44,10 @@ const LoginForm = () => {
         loginData.email,
         loginData.password
       );
-      const user = auth.currentUser;   
-      localStorage.setItem("currentUserId", user.uid)
+      const user = auth.currentUser;
+      localStorage.setItem("currentUserId", user.uid);
       toast.success("You've logged in successfully");
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
       console.error("Log-In Error:", error.message);
       toast.error("Log-In failed");
@@ -59,7 +59,7 @@ const LoginForm = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       toast.success("Google SignIn Successful! ");
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
       console.error("Google Sign-In Error:", error.message);
       toast.error("Google Sign-In failed");
@@ -89,16 +89,16 @@ const LoginForm = () => {
       >
         <form
           onSubmit={handleLogin}
-          className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-xl p-10 w-[90%] max-w-md flex flex-col items-center gap-6 text-white"
+          className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-xl p-6 sm:p-10 w-[90%] max-w-md mx-auto flex flex-col items-center gap-5 text-white"
         >
-          <h1 className="text-4xl font-light tracking-wide mb-2">
+          <h1 className="text-3xl sm:text-4xl font-light tracking-wide mb-2 text-center">
             Welcome Back
           </h1>
 
           {/* Google Login */}
           <button
             onClick={handleGoogleLogin}
-            className="w-full py-3 flex items-center justify-center gap-3 bg-white/20 hover:bg-white/30 transition rounded-lg font-medium"
+            className="w-full py-3 flex items-center justify-center gap-3 bg-white/20 hover:bg-white/30 transition rounded-lg font-medium text-sm sm:text-base"
           >
             <Chrome size={20} />
             Login with Google
@@ -112,7 +112,7 @@ const LoginForm = () => {
               name="email"
               value={loginData.email}
               onChange={handleChange}
-              className="pl-10 pr-4 py-3 w-full bg-white/10 text-white placeholder-white/60 rounded-lg outline-none focus:ring-2 focus:ring-white/40 transition"
+              className="pl-10 pr-4 py-3 w-full bg-white/10 text-white placeholder-white/60 rounded-lg outline-none focus:ring-2 focus:ring-white/40 transition text-sm sm:text-base"
             />
           </div>
 
@@ -124,7 +124,7 @@ const LoginForm = () => {
               value={loginData.password}
               onChange={handleChange}
               placeholder="Password"
-              className="pl-10 pr-10 py-3 w-full bg-white/10 text-white placeholder-white/60 rounded-lg outline-none focus:ring-2 focus:ring-white/40 transition"
+              className="pl-10 pr-10 py-3 w-full bg-white/10 text-white placeholder-white/60 rounded-lg outline-none focus:ring-2 focus:ring-white/40 transition text-sm sm:text-base"
             />
             {showPassword ? (
               <Eye
@@ -140,7 +140,7 @@ const LoginForm = () => {
           </div>
 
           {/* Forgot Password */}
-          <div className="w-full text-right text-sm">
+          <div className="w-full text-right text-xs sm:text-sm">
             <button
               type="button"
               onClick={handleForgotPassword}
@@ -152,7 +152,7 @@ const LoginForm = () => {
 
           <button
             type="submit"
-            className="w-full py-3 bg-purple-800 hover:bg-white/30 transition duration-200 text-white font-medium rounded-lg"
+            className="w-full py-3 bg-purple-800 hover:bg-white/30 transition duration-200 text-white font-medium rounded-lg text-sm sm:text-base"
           >
             Login
           </button>
@@ -160,12 +160,12 @@ const LoginForm = () => {
           {/* Divider */}
           <div className="w-full flex items-center gap-4">
             <hr className="flex-grow border-white/20" />
-            <span className="text-white/50 text-sm">or</span>
+            <span className="text-white/50 text-xs sm:text-sm">or</span>
             <hr className="flex-grow border-white/20" />
           </div>
 
           {/* Signup Link */}
-          <p className="text-sm text-white/70">
+          <p className="text-xs sm:text-sm text-white/70 text-center">
             Don't have an account?{" "}
             <NavLink to="/signup" className="underline hover:text-purple-800">
               Sign up
